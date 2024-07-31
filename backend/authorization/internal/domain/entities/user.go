@@ -42,7 +42,7 @@ func NewUser(user *command.CreateUserCommand) *User {
 	}
 }
 
-func (u *User) UpdatEmail(email string) error {
+func (u *User) UpdateEmail(email string) error {
 	u.Email = email
 	u.UpdatedAt = time.Now()
 

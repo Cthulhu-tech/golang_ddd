@@ -9,6 +9,7 @@ import (
 type UserService interface {
 	CreateUser(updateCommand *command.CreateUserCommand) (*command.CreateUserCommandResult, error)
 	FindAllUsers(offset, count int) (*query.UserQueryListResult, error)
+	// SearchUser(query string) (*query.UserQueryListResult, error)
 	FindUserById(id uuid.UUID) (*query.UserQueryResult, error)
 	UpdateUser(updateCommand *command.UpdateUserCommand) (*command.UpdateUserCommandResult, error)
 	DeleteUser(id uuid.UUID) error

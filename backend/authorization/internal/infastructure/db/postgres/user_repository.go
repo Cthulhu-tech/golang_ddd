@@ -33,6 +33,55 @@ func (repo *GormUserRepository) FindById(id uuid.UUID) (*entities.User, error) {
 	return fromDBUser(&dbUser), nil
 }
 
+func (repo *GormUserRepository) FindByEmail(email string) (*entities.User, error) {
+	var dbUser User
+	if err := repo.db.Where("email = ?", email).First(&dbUser).Error; err != nil {
+		return nil, err
+	}
+	return fromDBUser(&dbUser), nil
+}
+
+func (repo *GormUserRepository) FindByName(name string) ([]*entities.User, error) {
+	var dbUsers []User
+	if err := repo.db.Where("name LIKE ?", "%" + name + "%").First(&dbUsers).Error; err != nil {
+		return nil, err
+	}
+	users := make([]*entities.User, len(dbUsers))
+	for i, dbUser := range dbUsers {
+		users[i] = fromDBUser(&dbUser)
+	}
+
+	return users, nil
+}
+
+func (repo *GormUserRepository) FindBySurname(surname string) ([]*entities.User, error) {
+	var dbUsers []User
+	if err := repo.db.Where("surname LIKE ?", "%" + surname + "%").First(&dbUsers).Error; err != nil {
+		return nil, err
+	}
+
+	users := make([]*entities.User, len(dbUsers))
+	for i, dbUser := range dbUsers {
+		users[i] = fromDBUser(&dbUser)
+	}
+
+	return users, nil
+}
+
+func (repo *GormUserRepository) FindByLastname(lastname string) ([]*entities.User, error) {
+	var dbUsers []User
+	if err := repo.db.Where("lastname LIKE ?", "%" + lastname + "%").First(&dbUsers).Error; err != nil {
+		return nil, err
+	}
+
+	users := make([]*entities.User, len(dbUsers))
+	for i, dbUser := range dbUsers {
+		users[i] = fromDBUser(&dbUser)
+	}
+
+	return users, nil
+}
+
 func (repo *GormUserRepository) FindAll(offset, count int) ([]*entities.User, error) {
 	var dbUsers []User
 	if err := repo.db.Limit(count).Find(&dbUsers).Offset(offset).Error; err != nil {

@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/Cthulhu-tech/microservice/internal/application/command"
 	interfaces "github.com/Cthulhu-tech/microservice/internal/application/interface"
@@ -26,6 +27,15 @@ func (s *UserService) CreateUser(user *command.CreateUserCommand) (*command.Crea
 	validatedUser, err := entities.NewValidatedUser(newUser)
 	if err != nil {
 		return nil, err
+	}
+
+	findUser, err := s.repo.FindByEmail(validatedUser.Email)
+	if err != nil {
+		return nil, err
+	}
+	
+	if findUser != nil {
+		return nil, errors.New("user email found: " + findUser.Email)
 	}
 
 	_, err = s.repo.Create(validatedUser)
@@ -76,20 +86,40 @@ func (s *UserService) UpdateUser(updateCommand *command.UpdateUserCommand) (*com
 		return nil, errors.New("user not found")
 	}
 
-	if err := user.UpdateName(updateCommand.Name); err != nil {
-		return nil, err
+	var updateErrors []string
+
+	if updateCommand.Name != "" {
+		if err := user.UpdateName(updateCommand.Name); err != nil {
+			updateErrors = append(updateErrors, err.Error())
+		}
 	}
 
-	if err := user.UpdateLastName(updateCommand.Lastname); err != nil {
-		return nil, err
+	if updateCommand.Lastname != "" {
+		if err := user.UpdateLastName(updateCommand.Lastname); err != nil {
+			updateErrors = append(updateErrors, err.Error())
+		}
 	}
 
-	if err := user.UpdateSurName(updateCommand.Surname); err != nil {
-		return nil, err
+	if updateCommand.Surname != "" {
+		if err := user.UpdateSurName(updateCommand.Surname); err != nil {
+			updateErrors = append(updateErrors, err.Error())
+		}
 	}
 
-	if err := user.UpdatEmail(updateCommand.Email); err != nil {
-		return nil, err
+	if updateCommand.Email != "" {
+		if err := user.UpdateEmail(updateCommand.Email); err != nil {
+			updateErrors = append(updateErrors, err.Error())
+		}
+	}
+
+	if updateCommand.Password != "" {
+		if err := user.UpdatePassword(updateCommand.Password); err != nil {
+			updateErrors = append(updateErrors, err.Error())
+		}
+	}
+
+	if len(updateErrors) > 0 {
+		return nil, errors.New("Update error: " + strings.Join(updateErrors, ", "))
 	}
 
 	validatedUpdatedUser, err := entities.NewValidatedUser(user)
