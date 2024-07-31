@@ -23,6 +23,11 @@ func main () {
 
 	gormDB.AutoMigrate(&postgres.User{})
 
+	err = gormDB.Migrator().DropTable("user")
+	if err != nil {
+		log.Fatal("failed to drop tables: ", err)
+	}
+
 	userRepo := postgres.NewGormUserRepository(gormDB)
 
 	userService := services.NewUserService(userRepo)
